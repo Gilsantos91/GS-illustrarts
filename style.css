@@ -1,0 +1,258 @@
+/* ---------- Variáveis ---------- */
+:root{
+  --bg:#f4f6f8;
+  --card:#ffffff;
+  --text:#222;
+  --muted:#6b7280;
+  --primary:#25D366;
+  --danger:#ef4444;
+  --border:#e5e7eb;
+  --shadow:0 4px 14px rgba(0,0,0,.08);
+
+  --prio-low:#d1fae5;   /* verde claro */
+  --prio-med:#fef3c7;   /* amarelo claro */
+  --prio-high:#fee2e2;  /* vermelho claro */
+  --prio-low-border:#10b981;
+  --prio-med-border:#f59e0b;
+  --prio-high-border:#ef4444;
+}
+
+html[data-theme="dark"]{
+  --bg:#0f1115;
+  --card:#151922;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --primary:#25D366;
+  --danger:#ef4444;
+  --border:#273043;
+  --shadow:0 8px 20px rgba(0,0,0,.45);
+
+  --prio-low:#0e2a1f;
+  --prio-med:#2b2614;
+  --prio-high:#2a1616;
+  --prio-low-border:#10b981;
+  --prio-med-border:#f59e0b;
+  --prio-high-border:#ef4444;
+}
+
+*{ box-sizing:border-box; }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  line-height:1.4;
+}
+
+/* ---------- Topo ---------- */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 20px; position:sticky; top:0; z-index:10;
+  background:var(--bg); border-bottom:1px solid var(--border);
+  backdrop-filter: blur(6px);
+}
+.brand{ display:flex; align-items:center; gap:10px; font-weight:600; }
+.logo-img{ height:32px; display:block; }
+.actions{ display:flex; gap:10px; }
+
+/* ---------- Navegação (tabs) ---------- */
+.nav-tabs{ display:flex; align-items:center; gap:6px; margin-right:10px; }
+.nav-tabs .tab{
+  width:auto; padding:8px 10px; border-radius:10px; border:1px solid var(--border);
+  background:transparent; color:var(--text);
+}
+.nav-tabs .tab.active{ background:var(--primary); border-color:var(--primary); color:#fff; }
+
+/* ---------- Status de Sincronização ---------- */
+.sync-status{
+  display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted);
+  padding:4px 8px; border-radius:8px; background:rgba(0,0,0,.05);
+}
+.sync-indicator{ font-size:14px; }
+.sync-text{ font-weight:500; }
+
+/* ---------- Login ---------- */
+#login-screen{
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+}
+.login-card{
+  width:min(380px, 92vw);
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  box-shadow:var(--shadow); padding:24px; display:flex; flex-direction:column; gap:14px; text-align:center;
+}
+.login-card img{ height:54px; margin:0 auto 8px; display:block; }
+.login-card h1{ margin:0 0 6px; font-size:20px; }
+.login-card .muted{ color:var(--muted); font-size:13px; }
+
+/* ---------- Dashboard ---------- */
+.dashboard{
+  max-width:1150px; margin:18px auto 0; padding:14px 16px;
+  display:grid; gap:12px; grid-template-columns:repeat(4,1fr);
+  background:var(--card); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow);
+}
+.dash-item{
+  border:1px solid var(--border); border-radius:12px; padding:12px;
+  display:flex; flex-direction:column; gap:6px; background:rgba(0,0,0,.02);
+}
+.dash-item span{ color:var(--muted); font-size:14px; }
+.dash-item strong{ font-size:20px; }
+
+/* ---------- Layout ---------- */
+.grid{
+  max-width:1150px; margin:18px auto; padding:0 16px;
+  display:grid; gap:24px; grid-template-columns:1fr 1fr;
+}
+.card{
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  box-shadow:var(--shadow); padding:18px;
+}
+.card h2{ margin:0; }
+.card-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.with-toggle button.small{ padding:6px 8px; border-radius:10px; }
+
+/* collapsible */
+.collapsible{ overflow:hidden; transition:max-height .25s ease; }
+.collapsible.open{ max-height:2000px; }
+.collapsible:not(.open){ max-height:0; border-top:1px dashed var(--border); }
+
+/* ---------- Inputs & Buttons ---------- */
+.row{ display:grid; grid-template-columns:1fr; gap:10px; margin:12px 0; }
+.row-2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.stack{ display:flex; flex-direction:column; gap:10px; }
+
+input, textarea, select, button{
+  width:100%; padding:10px 12px; border-radius:12px;
+  border:1px solid var(--border); background:transparent; color:var(--text);
+}
+textarea{ min-height:84px; resize:vertical; }
+input:focus, textarea:focus, select:focus{
+  outline:none; border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(37,211,102,.2);
+}
+
+button{ border:none; cursor:pointer; font-weight:600; }
+button.primary{ background:var(--primary); color:#fff; }
+button.ghost{ background:transparent; border:1px solid var(--border); }
+button.danger{ background:var(--danger); color:#fff; }
+.checkbox{ display:flex; align-items:center; gap:8px; }
+
+/* ---------- Clientes ---------- */
+.client{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:10px; border:1px solid var(--border); border-radius:12px; background:rgba(0,0,0,.02);
+}
+.client .meta{ display:flex; flex-direction:column; gap:4px; }
+.client .meta small{ color:var(--muted); display:flex; align-items:center; gap:8px; }
+.client .meta a.wa{
+  display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px;
+  background:rgba(37,211,102,.12); border:1px solid rgba(37,211,102,.35); text-decoration:none; color:inherit;
+}
+.client .meta a.wa svg{ width:16px; height:16px; display:block; }
+
+.client .actions{ display:flex; gap:6px; }
+
+/* ---------- Filtros ---------- */
+.filters{
+  display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:10px; margin:8px 0 14px;
+}
+
+/* ---------- Jobs (compactos + expansíveis) ---------- */
+.job{
+  border:1px solid var(--border); border-radius:12px; background:rgba(0,0,0,.02);
+  padding:0; overflow:hidden;
+}
+.job-header{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:10px 12px; cursor:pointer; user-select:none;
+}
+.job.open .job-header{ border-bottom:1px dashed var(--border); }
+.job-title{
+  display:flex; align-items:center; gap:8px; font-weight:600;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.job-meta{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end;
+}
+.badge{ font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid var(--border); }
+.badge.prio-low{ background:var(--prio-low); border-color:var(--prio-low-border); }
+.badge.prio-med{ background:var(--prio-med); border-color:var(--prio-med-border); }
+.badge.prio-high{ background:var(--prio-high); border-color:var(--prio-high-border); }
+.badge.deadline{ background:rgba(0,0,0,.05); }
+.badge.pay-unpaid{ background:#fff0f0; border-color:#ff8585; }
+.badge.pay-half{ background:#fff8e6; border-color:#ffce73; }
+.badge.pay-paid{ background:#eaffe8; border-color:#77d78b; }
+
+.job-actions{ display:flex; gap:6px; }
+.job-actions button{ width:auto; }
+
+/* conteúdo expandido */
+.job-content{
+  border-top:1px dashed var(--border);
+  padding:10px 12px; display:none;
+}
+.job.open .job-content{ display:block; }
+
+/* Steps */
+.steps{ display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+.step{ display:flex; align-items:center; gap:8px; }
+.step .step-text{ flex:1; padding:8px 10px; border-radius:10px; border:1px solid var(--border); background:rgba(0,0,0,.02); min-height:36px; }
+.step.done .step-text{ text-decoration:line-through; opacity:.6; }
+.step .remove-step{ width:auto; padding:6px 8px; border-radius:10px; border:1px solid var(--border); }
+.step .move-up, .step .move-down{ width:auto; padding:6px 8px; border-radius:10px; border:1px solid var(--border); }
+
+/* Steps summary (leitura) */
+.steps-summary{ margin:8px 0 6px; padding-left:18px; }
+.steps-summary li{ margin:4px 0; }
+
+/* Price row inside job */
+.job-price{
+  margin:8px 0; padding:10px 12px; border:1px solid var(--border); border-radius:10px;
+  background:rgba(0,0,0,.03); font-weight:600;
+}
+
+/* Drag & drop */
+.droplist .job{ cursor:grab; }
+.droplist .job.dragging{ opacity:.6; }
+.placeholder{ height:8px; border:2px dashed var(--border); border-radius:8px; margin:6px 0; }
+
+/* ---------- Calendário ---------- */
+.calendar-card .calendar-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.cal-actions{ display:flex; align-items:center; gap:10px; }
+#cal-month{ min-width:200px; text-align:center; font-weight:600; }
+.calendar{ display:grid; grid-template-columns:repeat(7,1fr); gap:8px; border-top:1px solid var(--border); padding-top:8px; }
+.day{ min-height:96px; border:1px solid var(--border); border-radius:12px; padding:6px; display:flex; flex-direction:column; gap:4px; cursor:pointer; background:rgba(0,0,0,.02); }
+.day .d{ font-size:12px; color:var(--muted); }
+.day-list{ margin-top:10px; border-top:1px dashed var(--border); padding-top:10px; }
+.day-list .item{ padding:8px; border:1px solid var(--border); border-radius:10px; margin-bottom:8px; display:flex; justify-content:space-between; gap:8px; }
+
+/* ---------- Modal ---------- */
+.modal{ border:none; border-radius:16px; padding:0; width:min(760px, 96vw); background:var(--card); color:var(--text); }
+.modal::backdrop{ background:rgba(0,0,0,.45); }
+.modal-body{ padding:16px; }
+.modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:12px; }
+
+/* ---------- Relatório ---------- */
+.report-grid{ display:grid; grid-template-columns:280px 1fr; gap:16px; margin-top:8px; }
+.metrics{ display:grid; gap:10px; }
+.metric{ border:1px solid var(--border); border-radius:12px; padding:10px; background:rgba(0,0,0,.02); display:flex; flex-direction:column; gap:4px; }
+.table-wrap{ overflow:auto; border:1px solid var(--border); border-radius:12px; }
+#report-table{ width:100%; border-collapse:collapse; }
+#report-table th,#report-table td{ padding:8px 10px; border-bottom:1px solid var(--border); text-align:left; }
+.chart-wrap{ border:1px solid var(--border); border-radius:12px; padding:8px; }
+
+/* Financeiro reaproveita estilo da tabela */
+#fin-table{ width:100%; border-collapse:collapse; }
+#fin-table th,#fin-table td{ padding:8px 10px; border-bottom:1px solid var(--border); text-align:left; }
+
+/* ---------- Footer ---------- */
+footer.footer{ text-align:center; padding:18px; color:var(--muted); }
+
+/* ---------- Responsivo ---------- */
+@media (max-width:980px){
+  .grid{ grid-template-columns:1fr; }
+  .dashboard{ grid-template-columns:1fr 1fr; }
+  .report-grid{ grid-template-columns:1fr; }
+  .filters{ grid-template-columns:1fr 1fr; }
+}
+@media (max-width:640px){
+  .dashboard{ grid-template-columns:1fr; }
+  .filters{ grid-template-columns:1fr; }
+}

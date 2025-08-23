@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Firebase</title>
+</head>
+<body>
+    <h1>Teste do Firebase</h1>
+    <div id="status"></div>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Configuração -->
+    <script src="firebase-config.js"></script>
+    
+    <script>
+        const statusDiv = document.getElementById('status');
+        
+        function log(message) {
+            console.log(message);
+            statusDiv.innerHTML += '<p>' + message + '</p>';
+        }
+        
+        // Teste 1: Verificar se Firebase está carregado
+        log('=== Teste 1: Firebase ===');
+        if (typeof firebase !== 'undefined') {
+            log('✅ Firebase carregado');
+            log('Firebase version: ' + firebase.SDK_VERSION);
+        } else {
+            log('❌ Firebase não carregado');
+        }
+        
+        // Teste 2: Verificar Auth
+        log('=== Teste 2: Authentication ===');
+        if (typeof firebase.auth === 'function') {
+            log('✅ Firebase Auth disponível');
+        } else {
+            log('❌ Firebase Auth não disponível');
+        }
+        
+        // Teste 3: Verificar Firestore
+        log('=== Teste 3: Firestore ===');
+        if (typeof firebase.firestore === 'function') {
+            log('✅ Firebase Firestore disponível');
+        } else {
+            log('❌ Firebase Firestore não disponível');
+        }
+        
+        // Teste 4: Verificar configuração
+        log('=== Teste 4: Configuração ===');
+        try {
+            const config = firebase.app().options;
+            log('✅ Configuração carregada');
+            log('Project ID: ' + config.projectId);
+        } catch (error) {
+            log('❌ Erro na configuração: ' + error.message);
+        }
+        
+        // Teste 5: Teste de conexão
+        log('=== Teste 5: Conexão ===');
+        if (navigator.onLine) {
+            log('✅ Conectado à internet');
+        } else {
+            log('❌ Sem conexão com internet');
+        }
+        
+        log('=== Teste concluído ===');
+    </script>
+</body>
+</html>

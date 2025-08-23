@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestor de Design — ERP Lite</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192">
+  <link rel="icon" href="icons/icon-512.png" sizes="512x512">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+
+  <!-- Firebase para sincronização -->
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+  
+  <!-- Chart.js para gráfico do relatório -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <!-- jsPDF + html2canvas para exportar PDF -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
+
+  <!-- Configuração e sincronização -->
+  <script src="firebase-config.js"></script>
+  <script src="auth-manager.js"></script>
+  <script src="sync-manager.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <!-- LOGIN -->
+  <section id="login-screen" style="display:none;">
+    <form id="login-form" class="login-card">
+      <img id="login-logo" src="icons/logo-light.png" alt="logo">
+      <h1>Entrar</h1>
+      <div class="muted">Use seu usuário e senha para acessar.</div>
+      <input type="email" id="login-user" placeholder="Email" required>
+      <input type="password" id="login-pass" placeholder="Senha" required>
+      <button class="primary" type="submit">Acessar</button>
+      <small class="muted">Digite seu email e senha. Se for a primeira vez, uma conta será criada automaticamente.</small>
+    </form>
+  </section>
+
+  <div id="app-root" style="display:none;">
+    <header class="topbar">
+      <div class="brand">
+        <img id="brand-logo" src="icons/logo-light.png" alt="logo" class="logo-img">
+        <strong>Gestor de Design</strong>
+      </div>
+      <div class="actions">
+        <nav class="nav-tabs" role="tablist">
+          <button class="tab active" data-section="dashboard">Dashboard</button>
+          <button class="tab" data-section="crm">CRM</button>
+          <button class="tab" data-section="jobs">Trabalhos</button>
+          <button class="tab" data-section="calendar">Calendário</button>
+          <button class="tab" data-section="finance">Financeiro</button>
+          <button class="tab" data-section="reports">Relatórios</button>
+        </nav>
+        <div class="sync-status" id="sync-status">
+          <span class="sync-indicator" id="sync-indicator">🔄</span>
+          <span class="sync-text" id="sync-text">Sincronizando...</span>
+        </div>
+        <button id="theme-toggle" class="ghost">🌗 Tema</button>
+        <button id="open-settings" class="ghost">⚙️ Configurações</button>
+        <button id="logout-btn" class="ghost">🚪 Sair</button>
+      </div>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section class="card dashboard section" data-section="dashboard">
+      <div class="dash-item">
+        <span>Jobs Ativos</span>
+        <strong id="dash-active">0</strong>
+      </div>
+      <div class="dash-item">
+        <span>Concluídos</span>
+        <strong id="dash-done">0</strong>
+      </div>
+      <div class="dash-item">
+        <span>Recebido (mês)</span>
+        <strong id="dash-received">R$ 0,00</strong>
+      </div>
+      <div class="dash-item">
+        <span>Pendente (mês)</span>
+        <strong id="dash-pending">R$ 0,00</strong>
+      </div>
+    </section>
+
+    <main class="grid section" data-section="crm" style="display:none;">
+      <section class="card">
+        <div class="card-header with-toggle">
+          <h2>👥 Clientes</h2>
+          <button id="toggle-clients" class="ghost small" aria-expanded="true">⯆</button>
+        </div>
+        <div id="clients-area" class="collapsible open">
+          <form id="client-form" class="row">
+            <input type="text" id="client-name" placeholder="Nome" required>
+            <input type="text" id="client-company" placeholder="Empresa (opcional)">
+            <input type="tel" id="client-phone" placeholder="WhatsApp (com DDD)" required>
+            <button type="submit" class="primary">Adicionar Cliente</button>
+          </form>
+          <div id="client-list" class="stack"></div>
+        </div>
+      </section>
+    </main>
+
+    <main class="grid section" data-section="jobs" style="display:none;">
+      <!-- TRABALHOS ----------------------------------------------------------->
+      <section class="card">
+        <h2>📝 Trabalhos</h2>
+
+        <!-- Filtros e busca -->
+        <div class="filters">
+          <input type="text" id="search" placeholder="Buscar por título, cliente ou descrição...">
+          <select id="filter-priority">
+            <option value="__all__">Todas prioridades</option>
+            <option value="baixa">Baixa</option>
+            <option value="média">Média</option>
+            <option value="alta">Alta</option>
+          </select>
+          <select id="filter-paid">
+            <option value="__all__">Todos pagamentos</option>
+            <option value="paid">Somente pagos</option>
+            <option value="half">Somente 50%</option>
+            <option value="unpaid">Somente não pagos</option>
+          </select>
+          <select id="filter-status">
+            <option value="active">Em andamento</option>
+            <option value="done">Concluídos</option>
+            <option value="all">Todos</option>
+          </select>
+        </div>
+
+        <form id="job-form" class="row">
+          <input type="text" id="job-title" placeholder="Nome do trabalho" required>
+          <textarea id="job-desc" placeholder="Descrição"></textarea>
+          <div class="row-2">
+            <select id="job-client" required>
+              <option value="">Selecione um cliente</option>
+            </select>
+            <input type="number" id="job-price" placeholder="Preço (R$)" min="0" step="0.01">
+          </div>
+          <div class="row-2">
+            <input type="date" id="job-due" required>
+            <select id="job-priority" required>
+              <option value="baixa">Prioridade: baixa</option>
+              <option value="média">Prioridade: média</option>
+              <option value="alta">Prioridade: alta</option>
+            </select>
+          </div>
+          <div class="row">
+            <select id="job-template">
+              <option value="default">Template de etapas: Padrão (Design)</option>
+              <option value="social">Template de etapas: Social Media</option>
+              <option value="identidade">Template de etapas: Identidade Visual</option>
+              <option value="website">Template de etapas: Website</option>
+            </select>
+          </div>
+          <div class="row-2">
+            <select id="job-pay" required>
+              <option value="unpaid">Não pago</option>
+              <option value="half">Sinal 50%</option>
+              <option value="paid">Pago</option>
+            </select>
+            <button type="submit" class="primary">Adicionar Trabalho</button>
+          </div>
+        </form>
+
+        <div class="jobs-columns">
+          <div>
+            <h3>Em andamento (arraste para ordenar)</h3>
+            <div id="jobs-active" class="stack droplist"></div>
+          </div>
+          <div>
+            <h3>Concluídos</h3>
+            <div id="jobs-done" class="stack"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- CALENDÁRIO ---------------------------------------------------------->
+    <section class="card calendar-card section" data-section="calendar" style="display:none;">
+      <div class="calendar-header">
+        <h2>📅 Calendário</h2>
+        <div class="cal-actions">
+          <button id="prev-month" class="ghost">◀</button>
+          <div id="cal-month"></div>
+          <button id="next-month" class="ghost">▶</button>
+        </div>
+      </div>
+      <div id="calendar" class="calendar"></div>
+      <div id="calendar-day-list" class="day-list"></div>
+    </section>
+
+    <!-- MODAL EDITAR CLIENTE -->
+    <dialog id="modal-client" class="modal">
+      <form method="dialog" id="edit-client-form" class="modal-body">
+        <h3>✏️ Editar Cliente</h3>
+        <input type="hidden" id="edit-client-id">
+        <input type="text" id="edit-client-name" placeholder="Nome" required>
+        <input type="text" id="edit-client-company" placeholder="Empresa (opcional)">
+        <input type="tel" id="edit-client-phone" placeholder="WhatsApp (com DDD)" required>
+        <div class="modal-actions">
+          <button class="ghost" value="cancel">Cancelar</button>
+          <button class="primary" id="save-client">Salvar</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- MODAL EDITAR TRABALHO -->
+    <dialog id="modal-job" class="modal">
+      <form method="dialog" id="edit-job-form" class="modal-body">
+        <h3>✏️ Editar Trabalho</h3>
+        <input type="hidden" id="edit-job-id">
+        <input type="text" id="edit-job-title" placeholder="Nome" required>
+        <textarea id="edit-job-desc" placeholder="Descrição"></textarea>
+        <div class="row-2">
+          <select id="edit-job-client" required></select>
+          <input type="number" id="edit-job-price" placeholder="Preço (R$)" min="0" step="0.01">
+        </div>
+        <div class="row-2">
+          <input type="date" id="edit-job-due" required>
+          <select id="edit-job-priority" required>
+            <option value="baixa">baixa</option>
+            <option value="média">média</option>
+            <option value="alta">alta</option>
+          </select>
+        </div>
+        <div class="row-2">
+          <select id="edit-job-pay">
+            <option value="unpaid">Não pago</option>
+            <option value="half">Sinal 50%</option>
+            <option value="paid">Pago</option>
+          </select>
+          <label class="checkbox"><input type="checkbox" id="edit-job-done"> Concluído</label>
+        </div>
+        <div class="modal-actions">
+          <button class="ghost" value="cancel">Cancelar</button>
+          <button class="primary" id="save-job">Salvar</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- MODAL RELATÓRIO -->
+    <dialog id="modal-report" class="modal">
+      <div class="modal-body">
+        <h3>📊 Relatório Mensal</h3>
+        <div class="row-2">
+          <input type="month" id="report-month">
+          <select id="report-client">
+            <option value="__all__">Todos os clientes</option>
+          </select>
+        </div>
+        <div class="report-grid" id="report-view">
+          <div class="metrics">
+            <div class="metric"><span>Recebido</span><strong id="m-received">R$ 0,00</strong></div>
+            <div class="metric"><span>Pendente</span><strong id="m-pending">R$ 0,00</strong></div>
+            <div class="metric"><span>Total</span><strong id="m-total">R$ 0,00</strong></div>
+            <div class="metric"><span>Qtd. Jobs</span><strong id="m-count">0</strong></div>
+          </div>
+          <div class="chart-wrap"><canvas id="report-chart"></canvas></div>
+          <div class="table-wrap">
+            <table id="report-table">
+              <thead>
+                <tr><th>Nº</th><th>Data</th><th>Cliente</th><th>Trabalho</th><th>Preço</th><th>Pagamento</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="ghost" id="close-report">Fechar</button>
+          <button class="primary" id="export-pdf">Exportar PDF</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- MODAL CONFIRM PERSONALIZADO -->
+    <dialog id="modal-confirm" class="modal">
+      <div class="modal-body">
+        <h3 id="confirm-title">Confirmar ação</h3>
+        <p id="confirm-message">Tem certeza?</p>
+        <div class="modal-actions">
+          <button class="ghost" id="confirm-cancel">Cancelar</button>
+          <button class="danger" id="confirm-ok">Confirmar</button>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- FINANCEIRO ---------------------------------------------------------->
+    <section class="card section" data-section="finance" style="display:none;">
+      <h2>💰 Financeiro</h2>
+      <form id="finance-form" class="row">
+        <div class="row-2">
+          <select id="fin-type" required>
+            <option value="receita">Receita</option>
+            <option value="despesa">Despesa</option>
+          </select>
+          <input type="date" id="fin-date" required>
+        </div>
+        <input type="text" id="fin-desc" placeholder="Descrição" required>
+        <div class="row-2">
+          <input type="number" id="fin-amount" min="0" step="0.01" placeholder="Valor (R$)" required>
+          <select id="fin-job">
+            <option value="">Vincular a um trabalho (opcional)</option>
+          </select>
+        </div>
+        <button class="primary" type="submit">Adicionar lançamento</button>
+      </form>
+      <div class="report-grid" style="margin-top:10px;">
+        <div class="metrics">
+          <div class="metric"><span>Entradas</span><strong id="fin-in">R$ 0,00</strong></div>
+          <div class="metric"><span>Saídas</span><strong id="fin-out">R$ 0,00</strong></div>
+          <div class="metric"><span>Saldo</span><strong id="fin-balance">R$ 0,00</strong></div>
+        </div>
+        <div class="chart-wrap"><canvas id="fin-chart"></canvas></div>
+      </div>
+      <div class="table-wrap" style="margin-top:10px;">
+        <table id="fin-table">
+          <thead>
+            <tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Valor</th><th>Job</th><th>Ações</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- RELATÓRIOS ---------------------------------------------------------->
+    <section class="card section" data-section="reports" style="display:none;">
+      <h2>📊 Relatórios</h2>
+      <p>Abra o relatório mensal completo.</p>
+      <button id="open-report" class="primary">Abrir Relatório Mensal</button>
+    </section>
+
+    <!-- MODAL CONFIGURAÇÕES / MARCA -->
+    <dialog id="modal-settings" class="modal">
+      <form method="dialog" id="settings-form" class="modal-body">
+        <h3>⚙️ Configurações da Marca</h3>
+        <div class="row-2">
+          <div>
+            <label>Cor primária</label>
+            <input type="color" id="brand-primary" value="#25D366">
+          </div>
+          <div>
+            <label>Preferência de logo</label>
+            <select id="brand-logo-pref">
+              <option value="auto">Automático</option>
+              <option value="light">Claro</option>
+              <option value="dark">Escuro</option>
+            </select>
+          </div>
+        </div>
+        <div class="row-2">
+          <input type="text" id="brand-name" placeholder="Nome da empresa">
+          <input type="text" id="brand-email" placeholder="E-mail">
+        </div>
+        <div class="row-2">
+          <input type="text" id="brand-phone" placeholder="Telefone">
+          <input type="text" id="brand-address" placeholder="Endereço">
+        </div>
+        <div class="modal-actions">
+          <button class="ghost" value="cancel">Cancelar</button>
+          <button class="primary" id="save-settings">Salvar</button>
+        </div>
+      </form>
+    </dialog>
+
+    <footer class="footer">
+      <span>Feito para designers produtivos ✨</span>
+    </footer>
+  </div>
+
+  <!-- SW + troca automática do logo conforme tema -->
+  <script>
+    if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+    (function(){
+      function refreshLogo(){
+        const theme = document.documentElement.getAttribute('data-theme') || 'light';
+        const light = 'icons/logo-light.png';
+        const dark = 'icons/logo-dark.png';
+        const appLogo = document.getElementById('brand-logo');
+        const loginLogo = document.getElementById('login-logo');
+        const src = theme === 'dark' ? dark : light;
+        if (appLogo) appLogo.src = src;
+        if (loginLogo) loginLogo.src = src;
+      }
+      document.addEventListener('DOMContentLoaded', refreshLogo);
+      window.addEventListener('storage', (e)=>{ if(e.key === 'theme') refreshLogo(); });
+      setTimeout(refreshLogo, 0);
+    })();
+  </script>
+</body>
+</html>
