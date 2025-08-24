@@ -86,8 +86,15 @@ class AuthManager {
       await this.auth.signOut();
       this.currentUser = null;
       
-      // Limpar localStorage
+      // Limpar dados de autenticação e todos os dados do app
       localStorage.removeItem('authUser');
+      localStorage.removeItem("clients_v3");
+      localStorage.removeItem("jobs_v3");
+      localStorage.removeItem("finances_v1");
+      localStorage.removeItem("brand");
+      localStorage.removeItem("nextJobId");
+      
+      console.log('Logout realizado - todos os dados foram limpos');
     } catch (error) {
       console.error('Erro no logout:', error);
       throw error;
@@ -112,12 +119,8 @@ class AuthManager {
       }
     } else {
       console.log('Usuário deslogado');
-      // Limpar dados locais
-      localStorage.removeItem("clients_v3");
-      localStorage.removeItem("jobs_v3");
-      localStorage.removeItem("finances_v1");
-      localStorage.removeItem("brand");
-      localStorage.removeItem("nextJobId");
+      // Em caso de logout automático (refresh), manter os dados
+      // Os dados só serão limpos no logout manual
       localStorage.removeItem('authUser');
     }
   }

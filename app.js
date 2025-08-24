@@ -1398,8 +1398,8 @@ if(forceUpdateBtn){
           }
         }
         
-        // Limpar localStorage (exceto tema e dados de autenticação)
-        const keysToKeep = ['theme', 'authUser'];
+        // Limpar localStorage (exceto dados importantes)
+        const keysToKeep = ['theme', 'authUser', 'clients_v3', 'jobs_v3', 'finances_v1', 'brand', 'nextJobId'];
         const allKeys = Object.keys(localStorage);
         for (const key of allKeys) {
           if (!keysToKeep.includes(key)) {
@@ -1455,6 +1455,45 @@ function checkForSWUpdate() {
   }
 }
 
+// ================== VERIFICAR DADOS ==================
+function checkAndRestoreData() {
+  // Verificar se os dados principais existem
+  const hasClients = localStorage.getItem('clients_v3');
+  const hasJobs = localStorage.getItem('jobs_v3');
+  const hasFinances = localStorage.getItem('finances_v1');
+  
+  console.log('📊 Verificando dados:', {
+    clients: !!hasClients,
+    jobs: !!hasJobs,
+    finances: !!hasFinances
+  });
+  
+  // Se algum dado estiver faltando, tentar restaurar do backup
+  if (!hasClients || !hasJobs || !hasFinances) {
+    console.log('⚠️ Alguns dados estão faltando, verificando backups...');
+    
+    // Tentar restaurar de versões anteriores
+    const oldClients = localStorage.getItem('clients_v2') || localStorage.getItem('clients');
+    const oldJobs = localStorage.getItem('jobs_v2') || localStorage.getItem('jobs');
+    const oldFinances = localStorage.getItem('finances');
+    
+    if (oldClients && !hasClients) {
+      localStorage.setItem('clients_v3', oldClients);
+      console.log('✅ Clientes restaurados de backup');
+    }
+    
+    if (oldJobs && !hasJobs) {
+      localStorage.setItem('jobs_v3', oldJobs);
+      console.log('✅ Jobs restaurados de backup');
+    }
+    
+    if (oldFinances && !hasFinances) {
+      localStorage.setItem('finances_v1', oldFinances);
+      console.log('✅ Finanças restauradas de backup');
+    }
+  }
+}
+
 // ================== INIT ==================
 function migrateOldStorage(){
   // migrate v2 -> v3 (paid boolean -> pay tri-state)
@@ -1478,6 +1517,9 @@ async function initializeApp() {
   try {
     // Verificar atualizações do service worker
     checkForSWUpdate();
+    
+    // Verificar e restaurar dados se necessário
+    checkAndRestoreData();
     
     // Inicializar autenticação
     if (window.authManager) {
