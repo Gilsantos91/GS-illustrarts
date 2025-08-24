@@ -7,10 +7,11 @@
 - **Estratégia**: Network First para arquivos críticos (app.js, auth-manager.js, etc.)
 - **Benefício**: Arquivos críticos sempre tentam buscar versão mais recente primeiro
 
-### 2. Persistência de Autenticação Melhorada
-- **Problema**: Usuário era deslogado ao atualizar a página
+### 2. Persistência de Autenticação e Dados Melhorada
+- **Problema**: Usuário era deslogado ao atualizar a página e dados eram perdidos
 - **Solução**: Implementada persistência LOCAL no Firebase Auth
-- **Backup**: Dados de autenticação salvos no localStorage
+- **Backup**: Dados de autenticação e pedidos salvos no localStorage
+- **Proteção**: Dados só são limpos no logout manual, não em atualizações
 
 ### 3. Controle de Atualizações
 - **Detecção**: App detecta quando há nova versão disponível
@@ -46,11 +47,12 @@
 
 ## Verificação de Funcionamento
 
-### Teste de Autenticação
+### Teste de Autenticação e Dados
 1. Faça login no app
-2. Feche completamente o navegador
-3. Abra novamente e acesse o site
-4. **Resultado esperado**: Deve estar logado automaticamente
+2. Cadastre alguns clientes e pedidos
+3. Feche completamente o navegador
+4. Abra novamente e acesse o site
+5. **Resultado esperado**: Deve estar logado automaticamente E os dados devem estar preservados
 
 ### Teste de Atualizações
 1. Faça uma alteração no código
@@ -67,6 +69,7 @@ Service Worker instalando...
 Cache aberto
 Service Worker ativando...
 Removendo cache antigo: design-jobs-v1
+📊 Verificando dados: {clients: true, jobs: true, finances: true}
 ```
 
 ## Troubleshooting

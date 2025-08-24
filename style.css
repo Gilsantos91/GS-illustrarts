@@ -251,8 +251,306 @@ footer.footer{ text-align:center; padding:18px; color:var(--muted); }
   .dashboard{ grid-template-columns:1fr 1fr; }
   .report-grid{ grid-template-columns:1fr; }
   .filters{ grid-template-columns:1fr 1fr; }
+  
+  /* Melhorar navegação mobile */
+  .nav-tabs{ 
+    flex-wrap: wrap; 
+    gap: 4px; 
+    margin-right: 8px; 
+  }
+  .nav-tabs .tab{
+    padding: 6px 8px; 
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  
+  /* Ajustar topbar mobile */
+  .topbar{ 
+    padding: 10px 12px; 
+    flex-wrap: wrap; 
+    gap: 8px; 
+  }
+  .actions{ 
+    flex-wrap: wrap; 
+    gap: 6px; 
+    justify-content: flex-end;
+  }
+  .actions button{ 
+    padding: 6px 8px; 
+    font-size: 13px;
+  }
+  
+  /* Melhorar cards mobile */
+  .card{ 
+    padding: 14px; 
+    margin-bottom: 16px; 
+  }
+  
+  /* Ajustar jobs mobile */
+  .job-header{ 
+    padding: 8px 10px; 
+    flex-wrap: wrap; 
+    gap: 6px; 
+  }
+  .job-title{ 
+    font-size: 14px; 
+    flex: 1; 
+    min-width: 0; 
+  }
+  .job-meta{ 
+    flex-wrap: wrap; 
+    gap: 4px; 
+  }
+  .badge{ 
+    font-size: 11px; 
+    padding: 3px 6px; 
+  }
+  
+  /* Melhorar steps mobile */
+  .step{ 
+    flex-wrap: wrap; 
+    gap: 6px; 
+  }
+  .step .step-text{ 
+    padding: 6px 8px; 
+    font-size: 14px; 
+    min-height: 32px; 
+  }
+  .step .remove-step, 
+  .step .move-up, 
+  .step .move-down{ 
+    padding: 4px 6px; 
+    font-size: 12px; 
+  }
+  
+  /* Ajustar inputs mobile */
+  input, textarea, select, button{ 
+    padding: 8px 10px; 
+    font-size: 14px; 
+  }
+  .row-2{ 
+    grid-template-columns: 1fr; 
+  }
+  
+  /* Melhorar dashboard mobile */
+  .dashboard{ 
+    padding: 12px; 
+    gap: 8px; 
+  }
+  .dash-item{ 
+    padding: 10px; 
+  }
+  .dash-item strong{ 
+    font-size: 18px; 
+  }
 }
+
 @media (max-width:640px){
   .dashboard{ grid-template-columns:1fr; }
   .filters{ grid-template-columns:1fr; }
+  
+  /* Layout mobile mais compacto */
+  .grid{ 
+    padding: 0 12px; 
+    gap: 16px; 
+  }
+  
+  /* Topbar mobile compacta */
+  .topbar{ 
+    padding: 8px 10px; 
+  }
+  .brand{ 
+    font-size: 14px; 
+  }
+  .logo-img{ 
+    height: 28px; 
+  }
+  
+  /* Navegação mobile mais compacta */
+  .nav-tabs{ 
+    margin-right: 6px; 
+  }
+  .nav-tabs .tab{ 
+    padding: 5px 7px; 
+    font-size: 12px; 
+  }
+  
+  /* Ajustar sync status mobile */
+  .sync-status{ 
+    font-size: 12px; 
+    padding: 3px 6px; 
+  }
+  
+  /* Cards mobile mais compactos */
+  .card{ 
+    padding: 12px; 
+    border-radius: 12px; 
+  }
+  
+  /* Jobs mobile mais compactos */
+  .job-header{ 
+    padding: 6px 8px; 
+  }
+  .job-content{ 
+    padding: 8px 10px; 
+  }
+  
+  /* Steps mobile mais compactos */
+  .steps{ 
+    gap: 4px; 
+  }
+  .step .step-text{ 
+    padding: 5px 7px; 
+    font-size: 13px; 
+    min-height: 28px; 
+  }
+  
+  /* Modal mobile */
+  .modal{ 
+    width: 95vw; 
+    margin: 10px; 
+  }
+  .modal-body{ 
+    padding: 12px; 
+  }
+  
+  /* Tabelas mobile */
+  .table-wrap{ 
+    font-size: 12px; 
+  }
+  #report-table th, #report-table td,
+  #fin-table th, #fin-table td{ 
+    padding: 6px 8px; 
+  }
+  
+  /* Calendário mobile */
+  .calendar{ 
+    gap: 4px; 
+  }
+  .day{ 
+    min-height: 80px; 
+    padding: 4px; 
+  }
+  
+  /* Login mobile */
+  .login-card{ 
+    padding: 20px; 
+    margin: 10px; 
+  }
+}
+
+/* Melhorias específicas para telas muito pequenas */
+@media (max-width:480px){
+  .topbar{ 
+    flex-direction: column; 
+    align-items: stretch; 
+    gap: 10px; 
+  }
+  .actions{ 
+    justify-content: center; 
+  }
+  .nav-tabs{ 
+    justify-content: center; 
+    margin-right: 0; 
+  }
+  
+  /* Dashboard em coluna única */
+  .dashboard{ 
+    grid-template-columns: 1fr; 
+    gap: 10px; 
+  }
+  
+  /* Jobs em layout mais vertical */
+  .job-meta{ 
+    justify-content: flex-start; 
+    margin-top: 4px; 
+  }
+  
+  /* Steps em layout mais vertical */
+  .step{ 
+    flex-direction: column; 
+    align-items: stretch; 
+  }
+  .step .step-text{ 
+    order: 1; 
+  }
+  .step .remove-step, 
+  .step .move-up, 
+  .step .move-down{ 
+    order: 2; 
+    align-self: flex-end; 
+  }
+}
+
+/* Melhorias de acessibilidade e usabilidade mobile */
+@media (max-width:768px){
+  /* Aumentar área de toque */
+  button, input, select, textarea{ 
+    min-height: 44px; 
+  }
+  
+  /* Melhorar contraste em mobile */
+  .badge{ 
+    font-weight: 600; 
+  }
+  
+  /* Melhorar espaçamento de toque */
+  .job-actions button{ 
+    min-width: 44px; 
+    min-height: 44px; 
+  }
+  
+  /* Melhorar legibilidade */
+  .job-title{ 
+    line-height: 1.3; 
+  }
+  
+  /* Melhorar feedback visual */
+  .step .step-text:focus{ 
+    box-shadow: 0 0 0 2px var(--primary); 
+  }
+}
+
+/* Melhorias para mobile nos steps */
+@media (max-width:768px) {
+  .steps{ gap:8px; margin-top:10px; }
+  .step{ 
+    gap:6px; 
+    align-items: stretch; 
+  }
+  .step .step-text{ 
+    padding:10px 12px; 
+    min-height:44px; 
+    font-size:14px;
+    line-height:1.4;
+  }
+  .step .remove-step, 
+  .step .move-up, 
+  .step .move-down{ 
+    padding:8px 10px; 
+    min-width:44px;
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  
+  /* Melhorar feedback visual em mobile */
+  .step .step-text:focus{ 
+    box-shadow: 0 0 0 2px var(--primary); 
+    border-color: var(--primary);
+  }
+  
+  /* Melhorar contraste dos botões em mobile */
+  .step .remove-step:hover{ 
+    background: var(--danger); 
+    color: white; 
+    border-color: var(--danger);
+  }
+  .step .move-up:hover, 
+  .step .move-down:hover{ 
+    background: var(--primary); 
+    color: white; 
+    border-color: var(--primary);
+  }
 }

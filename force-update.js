@@ -18,7 +18,7 @@ async function clearAllCaches() {
 
 // Função para limpar localStorage
 function clearLocalStorage() {
-  const keysToKeep = ['theme']; // Manter apenas o tema
+  const keysToKeep = ['theme', 'clients_v3', 'jobs_v3', 'finances_v1', 'brand', 'nextJobId']; // Manter dados importantes
   const allKeys = Object.keys(localStorage);
   
   for (const key of allKeys) {

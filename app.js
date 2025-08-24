@@ -779,21 +779,27 @@ function renderJobs(){
 
     const stepLine = chk.closest(".step");
     stepLine.classList.toggle("done", chk.checked);
+    
+    // Manter o job aberto após marcar/desmarcar etapa
+    keepJobOpen(id);
   });
   $$("[data-steptext]").forEach(el => {
     el.addEventListener('input', ()=>{
       const [id, si] = el.dataset.steptext.split(":").map(Number);
       const jidx = jobs.findIndex(x=>x.id===id);
       jobs[jidx].steps[si].text = el.textContent; save();
+      
+      // Manter o job aberto após editar etapa
+      keepJobOpen(id);
     });
   });
   $$("[data-delstep]").forEach(btn => btn.onclick = (ev) => {
     const [id, si] = btn.dataset.delstep.split(":").map(Number);
     const jidx = jobs.findIndex(x=>x.id===id);
     jobs[jidx].steps.splice(si,1); save();
-    // remove line only
-    const line = ev.target.closest('.step');
-    line && line.remove();
+    
+    // Manter o job aberto após excluir etapa
+    keepJobOpen(id);
   });
 
   // mover etapas
@@ -804,15 +810,7 @@ function renderJobs(){
     const arr = jobs[jidx].steps;
     [arr[si-1], arr[si]] = [arr[si], arr[si-1]];
     save();
-    // re-render somente a lista do card aberto
-    const card = ev.target.closest('.job');
-    if(card){
-      renderJobs();
-      // reabrir o card atual
-      const idStr = String(id);
-      const newCard = [...document.querySelectorAll('.job')].find(el=>el.dataset.id===idStr);
-      newCard && newCard.classList.add('open');
-    }
+    keepJobOpen(id);
   });
   $$("[data-stepdown]").forEach(btn => btn.onclick = (ev) => {
     const [id, si] = btn.dataset.stepdown.split(":").map(Number);
@@ -821,13 +819,7 @@ function renderJobs(){
     if(si >= arr.length-1) return;
     [arr[si+1], arr[si]] = [arr[si], arr[si+1]];
     save();
-    const card = ev.target.closest('.job');
-    if(card){
-      renderJobs();
-      const idStr = String(id);
-      const newCard = [...document.querySelectorAll('.job')].find(el=>el.dataset.id===idStr);
-      newCard && newCard.classList.add('open');
-    }
+    keepJobOpen(id);
   });
 
   setupDragAndDrop();
@@ -1491,6 +1483,16 @@ function checkAndRestoreData() {
       localStorage.setItem('finances_v1', oldFinances);
       console.log('✅ Finanças restauradas de backup');
     }
+  }
+}
+
+// ================== MANTER JOB ABERTO ==================
+function keepJobOpen(jobId) {
+  // Re-renderizar jobs e reabrir o card atual
+  renderJobs();
+  const newCard = [...document.querySelectorAll('.job')].find(el => el.dataset.id === String(jobId));
+  if (newCard) {
+    newCard.classList.add('open');
   }
 }
 
