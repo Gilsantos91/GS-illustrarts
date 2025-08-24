@@ -362,6 +362,13 @@ function uiConfirm({title="Confirmar", message="Tem certeza?", okText="Confirmar
 // ================== AUTENTICAÇÃO COM FIREBASE ==================
 async function renderAuth(){
   const isAuth = window.authManager ? window.authManager.isLoggedIn() : false;
+  
+  console.log('🔐 Estado de autenticação:', {
+    isAuth,
+    hasAuthManager: !!window.authManager,
+    hasStoredAuth: window.authManager ? window.authManager.hasStoredAuth() : false
+  });
+  
   (loginScreen || {}).style && (loginScreen.style.display = isAuth ? "none" : "flex");
   (appRoot || {}).style && (appRoot.style.display = isAuth ? "block" : "none");
   
@@ -1530,7 +1537,10 @@ async function initializeApp() {
       // Tentar restaurar autenticação se necessário
       if (!window.authManager.isLoggedIn() && window.authManager.hasStoredAuth()) {
         console.log('Tentando restaurar autenticação...');
-        window.authManager.restoreAuth();
+        const restored = await window.authManager.restoreAuth();
+        if (restored) {
+          console.log('✅ Autenticação restaurada com sucesso!');
+        }
       }
     }
     
@@ -1553,4 +1563,27 @@ async function initializeApp() {
 }
 
 applyBrandLogos();
+
+// Listener para mudanças de estado de autenticação
+if (window.authManager) {
+  // Aguardar um pouco para o Firebase inicializar
+  setTimeout(() => {
+    window.authManager.auth.onAuthStateChanged(async (user) => {
+      console.log('🔄 Mudança de estado de autenticação:', user ? 'logado' : 'deslogado');
+      await renderAuth();
+      
+      // Se estiver logado, renderizar dados
+      if (user && window.authManager && window.authManager.isLoggedIn()) {
+        renderClients();
+        renderJobs();
+        renderCalendar();
+        renderReportClientOptions();
+        renderDashboard();
+        updateFinJobOptions();
+        updateSyncStatus();
+      }
+    });
+  }, 500);
+}
+
 initializeApp();

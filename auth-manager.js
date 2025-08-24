@@ -155,10 +155,24 @@ class AuthManager {
         if (this.auth.currentUser && this.auth.currentUser.uid === authData.uid) {
           this.currentUser = this.auth.currentUser;
           return true;
+        } else {
+          // Se não há usuário atual no Firebase, aguardar um pouco e tentar novamente
+          // Isso é necessário porque o Firebase pode demorar para restaurar a sessão
+          return new Promise((resolve) => {
+            setTimeout(() => {
+              if (this.auth.currentUser && this.auth.currentUser.uid === authData.uid) {
+                this.currentUser = this.auth.currentUser;
+                resolve(true);
+              } else {
+                resolve(false);
+              }
+            }, 1000); // Aguardar 1 segundo
+          });
         }
       } catch (error) {
         console.error('Erro ao restaurar autenticação:', error);
         localStorage.removeItem('authUser');
+        return false;
       }
     }
     return false;
