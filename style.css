@@ -98,6 +98,13 @@ html {
 }
 .sync-indicator{ font-size:14px; }
 .sync-text{ font-weight:500; }
+.sync-status button.small{ 
+  padding:2px 4px; 
+  font-size:12px; 
+  min-width:auto; 
+  min-height:auto;
+  border-radius:4px;
+}
 
 /* ---------- Login ---------- */
 #login-screen{

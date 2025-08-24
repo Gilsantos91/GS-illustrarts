@@ -171,3 +171,4 @@ button:active {
 - [ ] Notificações push
 - [ ] Modo offline avançado
 - [ ] Temas automáticos (claro/escuro)
+

@@ -122,3 +122,4 @@ service cloud.firestore {
 
 **🎉 Com essas correções, o Firebase deve funcionar perfeitamente!**
 
+

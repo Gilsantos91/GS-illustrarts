@@ -143,3 +143,4 @@ function keepJobOpen(jobId) {
 - [ ] Gestos de swipe
 - [ ] Modo offline melhorado
 - [ ] Notificações push
+

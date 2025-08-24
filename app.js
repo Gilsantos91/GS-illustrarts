@@ -28,6 +28,7 @@ const appRoot = $("#app-root");
 // Top
 const themeToggle = $("#theme-toggle");
 const forceUpdateBtn = $("#force-update");
+const forceSyncBtn = $("#force-sync");
 const tabs = document.querySelectorAll('.nav-tabs .tab');
 
 // Dashboard
@@ -134,6 +135,8 @@ function updateSyncStatus() {
   const indicator = $("#sync-indicator");
   const text = $("#sync-text");
   
+  console.log('📊 Atualizando status de sincronização:', status);
+  
   if (status.isOnline) {
     if (status.pendingChanges > 0) {
       indicator.textContent = "⏳";
@@ -145,6 +148,17 @@ function updateSyncStatus() {
   } else {
     indicator.textContent = "📴";
     text.textContent = "Offline";
+  }
+  
+  // Mostrar última sincronização se disponível
+  if (status.lastSync) {
+    const lastSync = new Date(status.lastSync);
+    const now = new Date();
+    const diffMinutes = Math.floor((now - lastSync) / (1000 * 60));
+    
+    if (diffMinutes > 5) {
+      text.textContent += ` (${diffMinutes}min atrás)`;
+    }
   }
 }
 
@@ -1383,6 +1397,27 @@ finForm && finForm.addEventListener('submit', (e)=>{
   finForm.reset();
   renderFinance();
 });
+
+// ================== FORCE SYNC ==================
+if(forceSyncBtn){
+  forceSyncBtn.addEventListener("click", async () => {
+    if(window.syncManager) {
+      try {
+        forceSyncBtn.disabled = true;
+        forceSyncBtn.textContent = "⏳";
+        await window.syncManager.forceSync();
+        updateSyncStatus();
+        alert('Sincronização forçada concluída!');
+      } catch (error) {
+        console.error('Erro na sincronização:', error);
+        alert('Erro na sincronização. Tente novamente.');
+      } finally {
+        forceSyncBtn.disabled = false;
+        forceSyncBtn.textContent = "🔄";
+      }
+    }
+  });
+}
 
 // ================== FORCE UPDATE ==================
 if(forceUpdateBtn){
