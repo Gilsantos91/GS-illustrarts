@@ -62,6 +62,7 @@
           <span class="sync-indicator" id="sync-indicator">🔄</span>
           <span class="sync-text" id="sync-text">Sincronizando...</span>
         </div>
+        <button id="force-update" class="ghost" title="Forçar atualização do app">🔄 Atualizar</button>
         <button id="theme-toggle" class="ghost">🌗 Tema</button>
         <button id="open-settings" class="ghost">⚙️ Configurações</button>
         <button id="logout-btn" class="ghost">🚪 Sair</button>
@@ -375,11 +376,35 @@
 
   <!-- SW + troca automática do logo conforme tema -->
   <script>
-    if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+    // Registrar Service Worker
+    if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js');
+        navigator.serviceWorker.register('service-worker.js')
+          .then(registration => {
+            console.log('Service Worker registrado:', registration);
+            
+            // Verificar atualizações
+            registration.addEventListener('updatefound', () => {
+              console.log('Nova versão do Service Worker encontrada');
+              const newWorker = registration.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('Nova versão disponível!');
+                  // Opcional: mostrar notificação para o usuário
+                  if (confirm('Uma nova versão está disponível. Deseja atualizar agora?')) {
+                    newWorker.postMessage({type: 'SKIP_WAITING'});
+                  }
+                }
+              });
+            });
+          })
+          .catch(error => {
+            console.error('Erro ao registrar Service Worker:', error);
+          });
       });
     }
+    
+    // Troca automática do logo conforme tema
     (function(){
       function refreshLogo(){
         const theme = document.documentElement.getAttribute('data-theme') || 'light';

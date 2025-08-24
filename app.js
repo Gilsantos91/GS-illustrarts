@@ -27,6 +27,7 @@ const appRoot = $("#app-root");
 
 // Top
 const themeToggle = $("#theme-toggle");
+const forceUpdateBtn = $("#force-update");
 const tabs = document.querySelectorAll('.nav-tabs .tab');
 
 // Dashboard
@@ -1384,6 +1385,47 @@ finForm && finForm.addEventListener('submit', (e)=>{
   renderFinance();
 });
 
+// ================== FORCE UPDATE ==================
+if(forceUpdateBtn){
+  forceUpdateBtn.addEventListener("click", async () => {
+    if(confirm("Isso irá limpar o cache e forçar uma atualização completa do app. Continuar?")){
+      try {
+        // Limpar caches
+        if ('caches' in window) {
+          const cacheNames = await caches.keys();
+          for (const cacheName of cacheNames) {
+            await caches.delete(cacheName);
+          }
+        }
+        
+        // Limpar localStorage (exceto tema e dados de autenticação)
+        const keysToKeep = ['theme', 'authUser'];
+        const allKeys = Object.keys(localStorage);
+        for (const key of allKeys) {
+          if (!keysToKeep.includes(key)) {
+            localStorage.removeItem(key);
+          }
+        }
+        
+        // Forçar atualização do service worker
+        if ('serviceWorker' in navigator) {
+          const registration = await navigator.serviceWorker.getRegistration();
+          if (registration) {
+            await registration.unregister();
+            setTimeout(async () => {
+              await navigator.serviceWorker.register('service-worker.js');
+              window.location.reload(true);
+            }, 1000);
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao forçar atualização:', error);
+        alert('Erro ao forçar atualização. Tente novamente.');
+      }
+    }
+  });
+}
+
 // ================== LOGOUT ==================
 const logoutBtn = $("#logout-btn");
 if(logoutBtn){
@@ -1395,6 +1437,22 @@ if(logoutBtn){
       console.error('Erro no logout:', error);
     }
   });
+}
+
+// ================== SERVICE WORKER UPDATE ==================
+function checkForSWUpdate() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(registration => {
+      registration.update();
+    });
+    
+    // Listener para atualizações do service worker
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      console.log('Service Worker atualizado!');
+      // Recarregar a página para aplicar as atualizações
+      window.location.reload();
+    });
+  }
 }
 
 // ================== INIT ==================
@@ -1418,9 +1476,18 @@ applyBrand();
 // Inicializar autenticação e sincronização
 async function initializeApp() {
   try {
+    // Verificar atualizações do service worker
+    checkForSWUpdate();
+    
     // Inicializar autenticação
     if (window.authManager) {
       await window.authManager.init();
+      
+      // Tentar restaurar autenticação se necessário
+      if (!window.authManager.isLoggedIn() && window.authManager.hasStoredAuth()) {
+        console.log('Tentando restaurar autenticação...');
+        window.authManager.restoreAuth();
+      }
     }
     
     // Renderizar interface baseada no estado de autenticação

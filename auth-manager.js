@@ -10,6 +10,9 @@ class AuthManager {
     this.auth = firebase.auth();
     this.currentUser = null;
     
+    // Configurar persistência de sessão
+    this.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+    
     // Listener para mudanças de autenticação
     this.auth.onAuthStateChanged((user) => {
       this.currentUser = user;
@@ -23,6 +26,13 @@ class AuthManager {
     const user = this.auth.currentUser;
     if (user) {
       this.currentUser = user;
+      // Salvar no localStorage para persistência
+      localStorage.setItem('authUser', JSON.stringify({
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL
+      }));
       return user;
     }
     return null;
@@ -33,6 +43,15 @@ class AuthManager {
     try {
       const userCredential = await this.auth.signInWithEmailAndPassword(email, password);
       this.currentUser = userCredential.user;
+      
+      // Salvar no localStorage
+      localStorage.setItem('authUser', JSON.stringify({
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        displayName: userCredential.user.displayName,
+        photoURL: userCredential.user.photoURL
+      }));
+      
       return userCredential.user;
     } catch (error) {
       console.error('Erro no login:', error);
@@ -45,6 +64,15 @@ class AuthManager {
     try {
       const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
       this.currentUser = userCredential.user;
+      
+      // Salvar no localStorage
+      localStorage.setItem('authUser', JSON.stringify({
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        displayName: userCredential.user.displayName,
+        photoURL: userCredential.user.photoURL
+      }));
+      
       return userCredential.user;
     } catch (error) {
       console.error('Erro no cadastro:', error);
@@ -57,6 +85,9 @@ class AuthManager {
     try {
       await this.auth.signOut();
       this.currentUser = null;
+      
+      // Limpar localStorage
+      localStorage.removeItem('authUser');
     } catch (error) {
       console.error('Erro no logout:', error);
       throw error;
@@ -67,6 +98,14 @@ class AuthManager {
   handleAuthStateChange(user) {
     if (user) {
       console.log('Usuário logado:', user.email);
+      // Salvar no localStorage
+      localStorage.setItem('authUser', JSON.stringify({
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL
+      }));
+      
       // Inicializar sincronização com o ID do usuário
       if (window.syncManager) {
         window.syncManager.init(user.uid);
@@ -79,6 +118,7 @@ class AuthManager {
       localStorage.removeItem("finances_v1");
       localStorage.removeItem("brand");
       localStorage.removeItem("nextJobId");
+      localStorage.removeItem('authUser');
     }
   }
 
@@ -95,6 +135,30 @@ class AuthManager {
   // Obter email do usuário atual
   getCurrentUserEmail() {
     return this.currentUser ? this.currentUser.email : null;
+  }
+
+  // Verificar se há dados de autenticação salvos
+  hasStoredAuth() {
+    return !!localStorage.getItem('authUser');
+  }
+
+  // Restaurar autenticação do localStorage (para casos de refresh)
+  restoreAuth() {
+    const storedAuth = localStorage.getItem('authUser');
+    if (storedAuth) {
+      try {
+        const authData = JSON.parse(storedAuth);
+        // Verificar se o usuário ainda está autenticado no Firebase
+        if (this.auth.currentUser && this.auth.currentUser.uid === authData.uid) {
+          this.currentUser = this.auth.currentUser;
+          return true;
+        }
+      } catch (error) {
+        console.error('Erro ao restaurar autenticação:', error);
+        localStorage.removeItem('authUser');
+      }
+    }
+    return false;
   }
 }
 

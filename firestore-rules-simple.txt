@@ -12,3 +12,4 @@ service cloud.firestore {
 // ⚠️ ATENÇÃO: Estas regras permitem acesso total aos dados
 // Use apenas para desenvolvimento e teste
 // Para produção, configure autenticação e regras mais restritivas
+

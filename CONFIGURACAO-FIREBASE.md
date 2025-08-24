@@ -106,3 +106,4 @@ Para maior segurança, você pode configurar autenticação:
 - O indicador de sincronização mostra o status atual
 - Dados são sincronizados automaticamente em segundo plano
 - Funciona em desktop, tablet e celular
+

@@ -146,3 +146,4 @@ firebase.auth().signInWithEmailAndPassword('teste@exemplo.com', '123456')
 ---
 
 **🔍 Se ainda não funcionar, compartilhe os erros do console para diagnóstico mais detalhado.**
+
